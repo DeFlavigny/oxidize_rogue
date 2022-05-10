@@ -10,4 +10,4 @@ pub struct Render {
 pub struct Player;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Monster;
+pub struct Enemy;
