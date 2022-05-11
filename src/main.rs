@@ -4,6 +4,7 @@ mod map;
 mod map_builder;
 mod spawner;
 mod systems;
+mod turn_state;
 mod prelude {
     pub use bracket_lib::prelude::*;
     pub use legion::systems::CommandBuffer;
@@ -19,6 +20,7 @@ mod prelude {
     pub use crate::map_builder::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
+    pub use crate::turn_state::*;
 }
 
 use prelude::*;
@@ -41,7 +43,9 @@ fn main() -> BError {
 struct State {
     ecs: World,
     resources: Resources,
-    systems: Schedule,
+    input_systems: Schedule,
+    player_systems: Schedule,
+    world_systems: Schedule,
 }
 
 impl State {
@@ -60,12 +64,15 @@ impl State {
             .map(|r| r.center())
             .for_each(|pos| spawn_monster(&mut ecs, pos, &mut rng));
 
+        resources.insert(TurnState::Ready);
         resources.insert(map_builder.map);
         resources.insert(Camera::new(map_builder.player_start));
         Self {
             ecs,
             resources,
-            systems: build_scheduler(),
+            input_systems: input_scheduler(),
+            player_systems: player_scheduler(),
+            world_systems: world_scheduler(),
         }
     }
 }
@@ -77,8 +84,13 @@ impl GameState for State {
         ctx.set_active_console(1);
         ctx.cls();
         self.resources.insert(ctx.key);
-        self.systems.execute(&mut self.ecs, &mut self.resources);
+        let current_state = self.resources.get::<TurnState>().expect("Turnstate not found").clone();
+
+        match current_state {
+            TurnState::Ready => self.input_systems.execute(&mut self.ecs, &mut self.resources),
+            TurnState::PlayerTurn => self.player_systems.execute(&mut self.ecs, &mut self.resources),
+            TurnState::WorldTurn => self.world_systems.execute(&mut self.ecs, &mut self.resources),
+            }
         render_draw_buffer(ctx).expect("Render Error");
-        // Tick stub
     }
 }

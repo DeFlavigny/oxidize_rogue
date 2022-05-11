@@ -15,6 +15,7 @@ pub fn spawn_monster(ecs: &mut World, pos: Point, rng: &mut RandomNumberGenerato
     ecs.push((
         Enemy,
         pos,
+        MoveWander,
         Render {
             color: ColorPair::new(WHITE, BLACK),
             glyph: match rng.range(0, 4) {
