@@ -13,5 +13,5 @@ pub fn entity_render(ecs: &mut SubWorld, #[resource] camera: &Camera) {
         .for_each(|(pos, render)| {
             draw_batch.set(*pos - offset, render.color, render.glyph);
         });
-    draw_batch.submit(9999).expect("Entity Batch Error");
+    draw_batch.submit(5000).expect("Entity Batch Error");
 }
