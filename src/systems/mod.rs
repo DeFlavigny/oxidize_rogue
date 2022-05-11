@@ -7,19 +7,6 @@ mod end_turn;
 
 use crate::prelude::*;
 
-use self::{entity_render::entity_render, collisions::collisions};
-
-pub fn build_scheduler() -> Schedule {
-    Schedule::builder()
-    .add_system(player_input::player_input_system())
-    .add_system(collisions::collisions_system())
-    .flush()
-    .add_system(map_renderers::map_render_system())
-    .add_system(entity_render::entity_render_system())
-    .add_system(move_wander::move_wander_system())
-    .build()
-}
-
 pub fn input_scheduler() -> Schedule {
     Schedule::builder()
     .add_system(player_input::player_input_system())
